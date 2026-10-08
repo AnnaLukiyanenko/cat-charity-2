@@ -48,6 +48,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 Создайте файл .env в корневой директории проекта:
+```env
+DATABASE_URL=sqlite+aiosqlite:///./qrkot.db
 SECRET=ваш_секретный_ключ
 
 Применение миграций
