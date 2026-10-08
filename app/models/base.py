@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Boolean, CheckConstraint, DateTime, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column
 
 
 class InvestmentMixin:
@@ -11,16 +11,18 @@ class InvestmentMixin:
         kwargs.setdefault('fully_invested', False)
         super().__init__(**kwargs)
 
-    __table_args__ = (
-        CheckConstraint(
-            'full_amount > 0',
-            name='check_full_amount_positive',
-        ),
-        CheckConstraint(
-            '0 <= invested_amount <= full_amount',
-            name='check_invested_amount_range',
+    @declared_attr
+    def __table_args__(cls):
+        return (
+            CheckConstraint(
+                'full_amount > 0',
+                name=f'check_{cls.__tablename__}_full_amount_positive',
+            ),
+            CheckConstraint(
+                'invested_amount >= 0 AND invested_amount <= full_amount',
+                name=f'check_{cls.__tablename__}_invested_amount_range',
+            ),
         )
-    )
 
     full_amount: Mapped[int] = mapped_column(
         Integer,

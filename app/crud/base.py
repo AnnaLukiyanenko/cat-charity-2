@@ -1,6 +1,5 @@
 from typing import Optional
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,12 +51,11 @@ class CRUDBase:
         obj_in,
         session: AsyncSession,
     ):
-        obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.model_dump(exclude_unset=True)
 
-        for field in obj_data:
-            if field in update_data:
-                setattr(db_obj, field, update_data[field])
+        for field, value in update_data.items():
+            if value is not None:
+                setattr(db_obj, field, value)
 
         session.add(db_obj)
         return db_obj
